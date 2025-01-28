@@ -40,7 +40,7 @@ In your `TSDIAPI-Server` application, import and register the plugin:
 import createPlugin from "tsdiapi-s3";
 import { createApp } from "tsdiapi-server";
 
-const app = createApp({
+createApp({
   plugins: [
     createPlugin({
       publicBucketName: "your-public-bucket", // Optional if defined in ENV (AWS_PUBLIC_BUCKET_NAME)
@@ -51,8 +51,6 @@ const app = createApp({
     }),
   ],
 });
-
-app.start();
 ```
 
 ### Alternative: Use Environment Variables
