@@ -4,9 +4,9 @@ export { s3 as s3Client } from './s3';
 export type PluginOptions = {
     publicBucketName?: string;
     privateBucketName?: string;
-    accessKeyId: string;
-    secretAccessKey: string;
-    region: string;
+    accessKeyId?: string;
+    secretAccessKey?: string;
+    region?: string;
 };
 declare class App implements AppPlugin {
     name: string;
