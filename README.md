@@ -1,6 +1,5 @@
 Here’s a well-structured `README.md` for your `tsdiapi-s3` plugin:
 
-```markdown
 # TSDIAPI-S3
 
 `TSDIAPI-S3` is a plugin for the `TSDIAPI-Server` framework that provides seamless integration with AWS S3 for file storage and management. It includes utilities for uploading, retrieving, and deleting files in both public and private S3 buckets, along with support for generating presigned URLs for secure file access.
