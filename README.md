@@ -28,6 +28,8 @@ npm install tsdiapi-s3
 
 ---
 
+Here’s the updated section:
+
 ## Usage
 
 ### Register the Plugin
@@ -35,17 +37,17 @@ npm install tsdiapi-s3
 In your `TSDIAPI-Server` application, import and register the plugin:
 
 ```typescript
-import createPlugin from 'tsdiapi-s3';
-import { createApp } from 'tsdiapi-server';
+import createPlugin from "tsdiapi-s3";
+import { createApp } from "tsdiapi-server";
 
 const app = createApp({
   plugins: [
     createPlugin({
-      publicBucketName: 'your-public-bucket',
-      privateBucketName: 'your-private-bucket',
-      accessKeyId: 'your-access-key-id',
-      secretAccessKey: 'your-secret-access-key',
-      region: 'your-region',
+      publicBucketName: "your-public-bucket", // Optional if defined in ENV (AWS_PUBLIC_BUCKET_NAME)
+      privateBucketName: "your-private-bucket", // Optional if defined in ENV (AWS_PRIVATE_BUCKET_NAME)
+      accessKeyId: "your-access-key-id", // Optional if defined in ENV (AWS_ACCESS_KEY_ID)
+      secretAccessKey: "your-secret-access-key", // Optional if defined in ENV (AWS_SECRET_ACCESS_KEY)
+      region: "your-region", // Optional if defined in ENV (AWS_REGION)
     }),
   ],
 });
@@ -53,15 +55,29 @@ const app = createApp({
 app.start();
 ```
 
+### Alternative: Use Environment Variables
+
+You can also define the configuration keys in your project's `.env` file. The plugin will automatically pick up these values:
+
+```dotenv
+AWS_PUBLIC_BUCKET_NAME=your-public-bucket
+AWS_PRIVATE_BUCKET_NAME=your-private-bucket
+AWS_ACCESS_KEY_ID=your-access-key-id
+AWS_SECRET_ACCESS_KEY=your-secret-access-key
+AWS_REGION=your-region
+```
+
+This approach allows you to avoid hardcoding sensitive information in your code. If both the `.env` configuration and the plugin options are provided, the plugin options take precedence.
+
 ### Plugin Configuration Options
 
-| Option             | Description                             | Required |
-|--------------------|-----------------------------------------|----------|
-| `publicBucketName` | Name of the public S3 bucket            | No       |
-| `privateBucketName`| Name of the private S3 bucket           | No       |
-| `accessKeyId`      | AWS access key ID                      | Yes      |
-| `secretAccessKey`  | AWS secret access key                  | Yes      |
-| `region`           | AWS region                             | Yes      |
+| Option              | Description                   | Required |
+| ------------------- | ----------------------------- | -------- |
+| `publicBucketName`  | Name of the public S3 bucket  | No       |
+| `privateBucketName` | Name of the private S3 bucket | No       |
+| `accessKeyId`       | AWS access key ID             | Yes      |
+| `secretAccessKey`   | AWS secret access key         | Yes      |
+| `region`            | AWS region                    | Yes      |
 
 ---
 
@@ -72,13 +88,16 @@ app.start();
 Uploads a single file to the public or private S3 bucket.
 
 ```typescript
-import { s3Client } from 'tsdiapi-s3';
+import { s3Client } from "tsdiapi-s3";
 
-const response = await s3Client.uploadToS3({
-  buffer: fileBuffer,
-  mimetype: 'image/png',
-  originalname: 'example.png',
-}, false); // Set to true for private bucket
+const response = await s3Client.uploadToS3(
+  {
+    buffer: fileBuffer,
+    mimetype: "image/png",
+    originalname: "example.png",
+  },
+  false
+); // Set to true for private bucket
 
 console.log(response.url); // Public or presigned URL
 ```
@@ -93,19 +112,19 @@ const privateResponses = await s3Client.uploadPrivateFiles(fileArray); // For pr
 ### Delete a File
 
 ```typescript
-await s3Client.deleteFromS3('path/to/file.png', false); // false for public bucket
+await s3Client.deleteFromS3("path/to/file.png", false); // false for public bucket
 ```
 
 ### Get a Presigned URL
 
 ```typescript
-const presignedUrl = await s3Client.getPresignedUrl('path/to/file.png', true); // true for private bucket
+const presignedUrl = await s3Client.getPresignedUrl("path/to/file.png", true); // true for private bucket
 ```
 
 ### Get Public URL
 
 ```typescript
-const publicUrl = s3Client.getPublicURL('path/to/file.png');
+const publicUrl = s3Client.getPublicURL("path/to/file.png");
 ```
 
 ---
@@ -138,12 +157,12 @@ Example:
 try {
   const response = await s3Client.uploadToS3({
     buffer: fileBuffer,
-    mimetype: 'application/pdf',
-    originalname: 'example.pdf',
+    mimetype: "application/pdf",
+    originalname: "example.pdf",
   });
-  console.log('File uploaded successfully:', response);
+  console.log("File uploaded successfully:", response);
 } catch (error) {
-  console.error('File upload failed:', error);
+  console.error("File upload failed:", error);
 }
 ```
 
@@ -167,4 +186,7 @@ Feel free to submit issues or feature requests via [GitHub Issues](https://githu
 
 - GitHub: [@unbywyd](https://github.com/unbywyd)
 - Email: [unbywyd@gmail.com](mailto:unbywyd@gmail.com)
+
+```
+
 ```
