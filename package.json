@@ -1,6 +1,7 @@
 {
   "name": "@tsdiapi/s3",
   "description": "A TSDIAPI plugin for seamless AWS S3 integration, enabling file uploads, downloads, and presigned URL generation.",
+  "version": "0.0.1-alpha.1",
   "private": false,
   "publishConfig": {
     "access": "public"
@@ -17,7 +18,6 @@
     "file-management",
     "typescript"
   ],
-  "version": "1.0.0",
   "main": "output/index.js",
   "types": "output/index.d.ts",
   "scripts": {
