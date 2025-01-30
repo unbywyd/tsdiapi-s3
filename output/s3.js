@@ -7,8 +7,8 @@ const s3_request_presigner_1 = require("@aws-sdk/s3-request-presigner");
 function generateFileName(file) {
     const now = new Date();
     const dateFolder = now.toISOString().split('T')[0];
-    const uniqueHash = (0, crypto_1.randomBytes)(8).toString('hex'); // Уникальный хеш
-    const fileExtension = file.originalname.split('.').pop(); // Расширение файла
+    const uniqueHash = (0, crypto_1.randomBytes)(8).toString('hex');
+    const fileExtension = file.originalname.split('.').pop();
     return `${dateFolder}/${uniqueHash}.${fileExtension}`;
 }
 class S3Config {

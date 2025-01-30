@@ -1,63 +1,63 @@
-Here’s a well-structured `README.md` for your `tsdiapi-s3` plugin:
+# @tsdiapi/s3
 
-# TSDIAPI-S3
-
-`TSDIAPI-S3` is a plugin for the `TSDIAPI-Server` framework that provides seamless integration with AWS S3 for file storage and management. It includes utilities for uploading, retrieving, and deleting files in both public and private S3 buckets, along with support for generating presigned URLs for secure file access.
+**@tsdiapi/s3** is a plugin for the **TSDIAPI-Server** framework that enables seamless file management with AWS S3. It supports both public and private bucket configurations, allowing you to upload, retrieve, delete files, and generate presigned URLs with ease.
 
 ---
 
-## Key Features
+## Features
 
-- **Public and Private Buckets:** Easily manage files in separate public and private S3 buckets.
-- **Presigned URLs:** Generate time-limited access URLs for secure file sharing.
-- **File Uploads:** Upload files using buffers or directly from `Multer`.
-- **File Deletion:** Delete files from S3 buckets with minimal effort.
-- **Multiple File Support:** Batch upload functionality for both public and private buckets.
-- **Customizable Configuration:** Configure bucket names, AWS credentials, and regions to suit your needs.
-- **Class Validator Compatibility:** Includes DTOs for better schema validation and response management.
+- **Public and Private Buckets**: Manage files separately across public and private S3 buckets.
+- **Presigned URLs**: Generate time-limited URLs for secure access to private files.
+- **File Uploads**: Upload single or multiple files using buffers or file objects.
+- **File Deletion**: Delete files from both public and private buckets.
+- **Handlebars Template Support**: Use templating for file management workflows.
+- **Flexible Configuration**: Supports both inline configuration and environment variables for AWS credentials and bucket details.
 
 ---
 
 ## Installation
 
-To install the plugin, run:
+```bash
+npm install @tsdiapi/s3
+```
+
+Alternatively, use the CLI tool to add the plugin:
 
 ```bash
-npm install tsdiapi-s3
+tsdiapi add plugin s3
 ```
 
 ---
-
-Here’s the updated section:
 
 ## Usage
 
 ### Register the Plugin
 
-In your `TSDIAPI-Server` application, import and register the plugin:
+Add the plugin to your **TSDIAPI-Server** setup:
 
 ```typescript
-import createPlugin from "tsdiapi-s3";
-import { createApp } from "tsdiapi-server";
+import { createApp } from "@tsdiapi/server";
+import createPlugin from "@tsdiapi/s3";
 
 createApp({
   plugins: [
     createPlugin({
-      publicBucketName: "your-public-bucket", // Optional if defined in ENV (AWS_PUBLIC_BUCKET_NAME)
-      privateBucketName: "your-private-bucket", // Optional if defined in ENV (AWS_PRIVATE_BUCKET_NAME)
-      accessKeyId: "your-access-key-id", // Optional if defined in ENV (AWS_ACCESS_KEY_ID)
-      secretAccessKey: "your-secret-access-key", // Optional if defined in ENV (AWS_SECRET_ACCESS_KEY)
-      region: "your-region", // Optional if defined in ENV (AWS_REGION)
+      provider: "s3",
+      publicBucketName: "your-public-bucket",
+      privateBucketName: "your-private-bucket",
+      accessKeyId: "your-access-key-id",
+      secretAccessKey: "your-secret-access-key",
+      region: "your-region",
     }),
   ],
 });
 ```
 
-### Alternative: Use Environment Variables
+### Environment Variables Setup
 
-You can also define the configuration keys in your project's `.env` file. The plugin will automatically pick up these values:
+Alternatively, you can use `.env` configuration to avoid hardcoding sensitive data:
 
-```dotenv
+```env
 AWS_PUBLIC_BUCKET_NAME=your-public-bucket
 AWS_PRIVATE_BUCKET_NAME=your-private-bucket
 AWS_ACCESS_KEY_ID=your-access-key-id
@@ -65,9 +65,7 @@ AWS_SECRET_ACCESS_KEY=your-secret-access-key
 AWS_REGION=your-region
 ```
 
-This approach allows you to avoid hardcoding sensitive information in your code. If both the `.env` configuration and the plugin options are provided, the plugin options take precedence.
-
-### Plugin Configuration Options
+### Plugin Options
 
 | Option              | Description                   | Required |
 | ------------------- | ----------------------------- | -------- |
@@ -83,10 +81,8 @@ This approach allows you to avoid hardcoding sensitive information in your code.
 
 ### Upload a File
 
-Uploads a single file to the public or private S3 bucket.
-
 ```typescript
-import { s3Client } from "tsdiapi-s3";
+import { s3Client } from "@tsdiapi/s3";
 
 const response = await s3Client.uploadToS3(
   {
@@ -94,29 +90,28 @@ const response = await s3Client.uploadToS3(
     mimetype: "image/png",
     originalname: "example.png",
   },
-  false
-); // Set to true for private bucket
+  false // Use `true` for private bucket
+);
 
-console.log(response.url); // Public or presigned URL
+console.log(response.url);
 ```
 
 ### Upload Multiple Files
 
 ```typescript
-const responses = await s3Client.uploadFiles(fileArray); // For public bucket
-const privateResponses = await s3Client.uploadPrivateFiles(fileArray); // For private bucket
+const responses = await s3Client.uploadFiles(fileArray);
 ```
 
 ### Delete a File
 
 ```typescript
-await s3Client.deleteFromS3("path/to/file.png", false); // false for public bucket
+await s3Client.deleteFromS3("path/to/file.png", false);
 ```
 
-### Get a Presigned URL
+### Generate a Presigned URL
 
 ```typescript
-const presignedUrl = await s3Client.getPresignedUrl("path/to/file.png", true); // true for private bucket
+const presignedUrl = await s3Client.getPresignedUrl("path/to/file.png", true);
 ```
 
 ### Get Public URL
@@ -127,29 +122,17 @@ const publicUrl = s3Client.getPublicURL("path/to/file.png");
 
 ---
 
-## Example Use Case
+## Example Workflow
 
-Here’s how you can use `TSDIAPI-S3` to upload and manage files in your API:
-
-1. **Upload a File:**
-
-   Use the provided methods to upload files to either public or private S3 buckets, depending on your application's requirements.
-
-2. **Generate Secure URLs:**
-
-   For private files, generate presigned URLs to share secure access with limited expiration time.
-
-3. **Batch File Uploads:**
-
-   Easily upload multiple files to S3 and retrieve their URLs for further processing.
+1. **Upload Files**: Upload files to public or private buckets.
+2. **Access Secure Files**: Use presigned URLs to grant secure, temporary access to private files.
+3. **Batch Operations**: Handle multiple files at once for efficient management.
 
 ---
 
 ## Error Handling
 
-All methods include robust error handling, logging issues in file uploads, deletions, or retrievals.
-
-Example:
+All methods are designed with built-in error handling and logging.
 
 ```typescript
 try {
@@ -168,23 +151,19 @@ try {
 
 ## Contributing
 
-Feel free to submit issues or feature requests via [GitHub Issues](https://github.com/unbywyd/tsdiapi-s3/issues). Pull requests are welcome!
+We welcome contributions! Feel free to submit issues or pull requests to improve the plugin via [GitHub Issues](https://github.com/unbywyd/tsdiapi-s3/issues).
 
 ---
 
 ## License
 
-`TSDIAPI-S3` is open-sourced software licensed under the [MIT license](LICENSE).
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ---
 
-## About the Author
+## Author
 
 **Artyom Gorlovetskiy**
 
 - GitHub: [@unbywyd](https://github.com/unbywyd)
 - Email: [unbywyd@gmail.com](mailto:unbywyd@gmail.com)
-
-```
-
-```

@@ -1,5 +1,4 @@
-import "reflect-metadata";
-import { AppContext, AppPlugin } from "tsdiapi-server";
+import type { AppContext, AppPlugin } from "@tsdiapi/server";
 import { s3 } from "./s3";
 export { s3 as s3Client } from './s3';
 

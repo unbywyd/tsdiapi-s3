@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.s3Client = void 0;
 exports.default = createPlugin;
-require("reflect-metadata");
 const s3_1 = require("./s3");
 var s3_2 = require("./s3");
 Object.defineProperty(exports, "s3Client", { enumerable: true, get: function () { return s3_2.s3; } });

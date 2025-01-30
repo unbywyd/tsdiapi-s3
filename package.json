@@ -1,6 +1,10 @@
 {
-  "name": "tsdiapi-s3",
+  "name": "@tsdiapi/s3",
   "description": "A TSDIAPI plugin for seamless AWS S3 integration, enabling file uploads, downloads, and presigned URL generation.",
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [
     "tsdiapi",
     "s3",
@@ -33,13 +37,9 @@
     "@aws-sdk/s3-request-presigner": "^3.735.0"
   },
   "devDependencies": {
+    "@tsdiapi/server": "^0.0.1-alpha",
     "@types/node": "^22.10.10",
-    "tsdiapi-server": "github:unbywyd/tsdiapi-server#master",
     "typescript": "^5.7.2"
-  },
-  "peerDependencies": {
-    "reflect-metadata": "^0.1.13",
-    "typedi": "^0.10.0"
   },
   "repository": {
     "type": "git",

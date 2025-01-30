@@ -18,8 +18,8 @@ import { PluginOptions } from './index';
 function generateFileName(file: { originalname: string }): string {
     const now = new Date();
     const dateFolder = now.toISOString().split('T')[0];
-    const uniqueHash = randomBytes(8).toString('hex'); // Уникальный хеш
-    const fileExtension = file.originalname.split('.').pop(); // Расширение файла
+    const uniqueHash = randomBytes(8).toString('hex');
+    const fileExtension = file.originalname.split('.').pop();
 
     return `${dateFolder}/${uniqueHash}.${fileExtension}`;
 }
