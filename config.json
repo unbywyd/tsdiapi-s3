@@ -1,0 +1,71 @@
+{
+    "name": "@tsdiapi/s3",
+    "description": "A TSDIAPI plugin for seamless AWS S3 integration, enabling file uploads, downloads, and presigned URL generation.",
+    "variables": [
+        {
+            "key": "AWS_PUBLIC_BUCKET_NAME",
+            "type": "string",
+            "default": "",
+            "configurable": true,
+            "description": "The name of the AWS public bucket",
+            "inquirer": {
+                "message": "Enter the name of the AWS public bucket:",
+                "required": true
+            }
+        },
+        {
+            "key": "AWS_PRIVATE_BUCKET_NAME",
+            "type": "string",
+            "default": "",
+            "configurable": true,
+            "description": "The name of the AWS private bucket",
+            "inquirer": {
+                "message": "Enter the name of the AWS private bucket:",
+                "required": true
+            }
+        },
+        {
+            "key": "AWS_ACCESS_KEY_ID",
+            "type": "string",
+            "default": "",
+            "configurable": true,
+            "description": "The AWS Access Key ID",
+            "inquirer": {
+                "message": "Enter the AWS Access Key ID:",
+                "required": true
+            }
+        },
+        {
+            "key": "AWS_SECRET_ACCESS_KEY",
+            "type": "string",
+            "default": "",
+            "configurable": true,
+            "description": "The AWS Secret Access Key",
+            "inquirer": {
+                "message": "Enter the AWS Secret Access Key:",
+                "required": true,
+                "mask": "*"
+            }
+        },
+        {
+            "key": "AWS_REGION",
+            "type": "string",
+            "default": "us-east-1",
+            "configurable": true,
+            "description": "The AWS region",
+            "inquirer": {
+                "message": "Enter the AWS region:"
+            }
+        },
+        {
+            "key": "AWS_CUSTOM_HOST",
+            "type": "string",
+            "default": "us-east-1",
+            "configurable": true,
+            "description": "The AWS custom host",
+            "inquirer": {
+                "message": "Enter the AWS region:"
+            }
+        }
+    ]
+}
