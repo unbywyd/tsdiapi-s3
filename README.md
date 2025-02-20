@@ -48,6 +48,7 @@ createApp({
       accessKeyId: "your-access-key-id",
       secretAccessKey: "your-secret-access-key",
       region: "your-region",
+      customHost: "your-custom-host", // Optional	(CDN or custom domain)
     }),
   ],
 });
@@ -63,6 +64,7 @@ AWS_PRIVATE_BUCKET_NAME=your-private-bucket
 AWS_ACCESS_KEY_ID=your-access-key-id
 AWS_SECRET_ACCESS_KEY=your-secret-access-key
 AWS_REGION=your-region
+AWS_CUSTOM_HOST=your-custom-host
 ```
 
 ### Plugin Options
@@ -74,6 +76,7 @@ AWS_REGION=your-region
 | `accessKeyId`       | AWS access key ID             | Yes      |
 | `secretAccessKey`   | AWS secret access key         | Yes      |
 | `region`            | AWS region                    | Yes      |
+| `customHost`        | Custom host or CDN URL        | No       |
 
 ---
 

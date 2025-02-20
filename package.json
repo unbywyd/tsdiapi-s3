@@ -1,7 +1,7 @@
 {
   "name": "@tsdiapi/s3",
   "description": "A TSDIAPI plugin for seamless AWS S3 integration, enabling file uploads, downloads, and presigned URL generation.",
-  "version": "0.0.1-alpha.1",
+  "version": "0.0.1-alpha.2",
   "private": false,
   "publishConfig": {
     "access": "public"
