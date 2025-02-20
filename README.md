@@ -24,7 +24,7 @@ npm install @tsdiapi/s3
 Alternatively, use the CLI tool to add the plugin:
 
 ```bash
-tsdiapi add plugin s3
+tsdiapi plugins add s3
 ```
 
 ---

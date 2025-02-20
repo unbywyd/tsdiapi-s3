@@ -60,11 +60,10 @@
         {
             "key": "AWS_CUSTOM_HOST",
             "type": "string",
-            "default": "us-east-1",
             "configurable": true,
             "description": "The AWS custom host",
             "inquirer": {
-                "message": "Enter the AWS region:"
+                "message": "Custom host (optional):"
             }
         }
     ]
