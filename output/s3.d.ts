@@ -31,8 +31,10 @@ export declare class S3Config {
     privateBucketName: string;
     accessKeyId: string;
     secretAccessKey: string;
+    customHost?: string;
     region: string;
     client: S3Client;
+    get url(): string;
     init(options: PluginOptions): void;
     /**
      * Deletes a file from an S3 bucket.

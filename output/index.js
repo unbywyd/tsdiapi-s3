@@ -21,6 +21,8 @@ class App {
         const accessKeyId = appConfig?.accessKeyId || appConfig['AWS_ACCESS_KEY_ID'] || config.accessKeyId;
         const secretAccessKey = appConfig?.secretAccessKey || appConfig['AWS_SECRET_ACCESS_KEY'] || config.secretAccessKey;
         const region = appConfig?.region || appConfig['AWS_REGION'] || config.region;
+        const customHost = appConfig?.customHost || appConfig['AWS_CUSTOM_HOST'] || config.customHost;
+        this.config.customHost = customHost;
         this.config.publicBucketName = publicBucketName;
         this.config.privateBucketName = privateBucketName;
         this.config.accessKeyId = accessKeyId;

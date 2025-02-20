@@ -6,6 +6,7 @@ export type PluginOptions = {
     accessKeyId?: string;
     secretAccessKey?: string;
     region?: string;
+    customHost?: string;
 };
 declare class App implements AppPlugin {
     name: string;

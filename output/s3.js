@@ -16,14 +16,20 @@ class S3Config {
     privateBucketName;
     accessKeyId;
     secretAccessKey;
+    customHost;
     region;
     client;
+    get url() {
+        const host = this?.customHost ? this.customHost : `https://${this.publicBucketName}.s3.${this.region}.amazonaws.com`;
+        return host.endsWith('/') ? host : `${host}/`;
+    }
     init(options) {
         this.publicBucketName = options.publicBucketName;
         this.privateBucketName = options.privateBucketName;
         this.accessKeyId = options.accessKeyId;
         this.secretAccessKey = options.secretAccessKey;
         this.region = options.region;
+        this.customHost = options.customHost;
         const s3Config = {
             region: this.region,
             credentials: {
@@ -92,11 +98,10 @@ class S3Config {
                     reject(error);
                 }
                 else {
-                    const url = `https://${bucket}.s3.${this.region}.amazonaws.com/${fileName}`;
                     resolve({
                         url: isPrivate
                             ? await this.getPresignedUrl(fileName, true)
-                            : url,
+                            : `${this.url}${fileName}`,
                         key: fileName,
                         bucket: bucket,
                         region: this.region
@@ -129,11 +134,10 @@ class S3Config {
                     reject(error);
                 }
                 else {
-                    const url = `https://${bucket}.s3.${this.region}.amazonaws.com/${fileName}`;
                     resolve({
                         url: isPrivate
                             ? await this.getPresignedUrl(fileName, true)
-                            : url,
+                            : `${this.url}${fileName}`,
                         key: fileName,
                         bucket: bucket,
                         region: this.region
@@ -148,7 +152,7 @@ class S3Config {
      * @returns A publicly accessible URL.
      */
     getPublicURL = (key) => {
-        return `https://${this.publicBucketName}.s3.${this.region}.amazonaws.com/${key}`;
+        return `${this.url}${key}`;
     };
     /**
      * Retrieves a presigned URL for a file in the private bucket.
