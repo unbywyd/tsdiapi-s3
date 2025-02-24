@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.s3 = exports.checkFilesAreImages = exports.S3Config = void 0;
+exports.S3Provider = void 0;
+exports.generateFileName = generateFileName;
 const client_s3_1 = require("@aws-sdk/client-s3");
 const crypto_1 = require("crypto");
 const s3_request_presigner_1 = require("@aws-sdk/s3-request-presigner");
@@ -11,7 +12,7 @@ function generateFileName(file) {
     const fileExtension = file.originalname.split('.').pop();
     return `${dateFolder}/${uniqueHash}.${fileExtension}`;
 }
-class S3Config {
+class S3Provider {
     publicBucketName;
     privateBucketName;
     accessKeyId;
@@ -19,6 +20,7 @@ class S3Config {
     customHost;
     region;
     client;
+    generateFileNameFunc = generateFileName;
     get url() {
         const host = this?.customHost ? this.customHost : `https://${this.publicBucketName}.s3.${this.region}.amazonaws.com`;
         return host.endsWith('/') ? host : `${host}/`;
@@ -30,6 +32,9 @@ class S3Config {
         this.secretAccessKey = options.secretAccessKey;
         this.region = options.region;
         this.customHost = options.customHost;
+        if (options.generateFileNameFunc && typeof options.generateFileNameFunc === 'function') {
+            this.generateFileNameFunc = options.generateFileNameFunc;
+        }
         const s3Config = {
             region: this.region,
             credentials: {
@@ -82,8 +87,13 @@ class S3Config {
      * @returns An object containing the public URL or presigned URL (if private) and the S3 key.
      */
     async uploadBufferToS3(buffer, mimetype, originalname, isPrivate = false) {
-        const fileName = generateFileName({ originalname });
         const bucket = isPrivate ? this.privateBucketName : this.publicBucketName;
+        const fileName = this.generateFileNameFunc({
+            mimetype,
+            originalname,
+            bucket,
+            region: this.region
+        });
         const params = {
             Bucket: bucket,
             Key: fileName,
@@ -117,8 +127,12 @@ class S3Config {
         * @returns An object containing the public URL or presigned URL (if private) and the S3 key.
         */
     async uploadToS3(file, isPrivate = false) {
-        const fileName = generateFileName(file);
         const bucket = isPrivate ? this.privateBucketName : this.publicBucketName;
+        const fileName = this.generateFileNameFunc({
+            ...file,
+            bucket,
+            region: this.region
+        });
         const params = {
             Bucket: bucket,
             Key: fileName,
@@ -189,19 +203,5 @@ class S3Config {
         return results;
     };
 }
-exports.S3Config = S3Config;
-/**
- * Checks if multiple uploaded files are images.
- * @param files - An array of file objects (e.g., from Multer).
- * @throws Error if any file is not an image.
- */
-const checkFilesAreImages = (files) => {
-    for (const file of files) {
-        if (!file.mimetype.startsWith('image')) {
-            throw new Error('File is not an image');
-        }
-    }
-};
-exports.checkFilesAreImages = checkFilesAreImages;
-exports.s3 = new S3Config();
+exports.S3Provider = S3Provider;
 //# sourceMappingURL=s3.js.map

@@ -15,7 +15,8 @@ import { randomBytes } from 'crypto';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { PluginOptions } from './index';
 
-function generateFileName(file: { originalname: string }): string {
+export type FileMeta = { mimetype: string; originalname: string; bucket: string; region: string };
+export function generateFileName(file: FileMeta): string {
     const now = new Date();
     const dateFolder = now.toISOString().split('T')[0];
     const uniqueHash = randomBytes(8).toString('hex');
@@ -23,7 +24,6 @@ function generateFileName(file: { originalname: string }): string {
 
     return `${dateFolder}/${uniqueHash}.${fileExtension}`;
 }
-
 
 /**
  * Represents the response for a successful file upload.
@@ -33,32 +33,12 @@ export interface UploadFileResponse {
      * Publicly accessible URL of the uploaded file (or a presigned URL if private).
      */
     url: string;
-    /**
-     * Key (path) of the file stored in S3.
-     */
     key: string;
-
-
     bucket: string;
-
     region: string;
 }
 
-/**
- * Class-validator DTO representation of the upload file response.
- */
-export interface UploadFileResponseDTO {
-    url: string;
-    key: string;
-}
-
-export interface InputFileKeyDTO {
-    key: string;
-    isPrivate: boolean;
-}
-
-
-export class S3Config {
+export class S3Provider {
     publicBucketName: string;
     privateBucketName: string;
     accessKeyId: string;
@@ -66,6 +46,7 @@ export class S3Config {
     customHost?: string;
     region: string;
     client: S3Client;
+    generateFileNameFunc: (file: FileMeta) => string = generateFileName;
     get url() {
         const host = this?.customHost ? this.customHost : `https://${this.publicBucketName}.s3.${this.region}.amazonaws.com`;
         return host.endsWith('/') ? host : `${host}/`;
@@ -77,6 +58,9 @@ export class S3Config {
         this.secretAccessKey = options.secretAccessKey;
         this.region = options.region;
         this.customHost = options.customHost;
+        if (options.generateFileNameFunc && typeof options.generateFileNameFunc === 'function') {
+            this.generateFileNameFunc = options.generateFileNameFunc;
+        }
         const s3Config: S3ClientConfig = {
             region: this.region,
             credentials: {
@@ -140,9 +124,15 @@ export class S3Config {
         originalname: string,
         isPrivate = false,
     ): Promise<UploadFileResponse> {
-        const fileName = generateFileName({ originalname });
-
         const bucket = isPrivate ? this.privateBucketName : this.publicBucketName;
+
+        const fileName = this.generateFileNameFunc({
+            mimetype,
+            originalname,
+            bucket,
+            region: this.region
+        });
+
         const params: PutObjectCommandInput = {
             Bucket: bucket,
             Key: fileName,
@@ -182,9 +172,14 @@ export class S3Config {
         file: { buffer: Buffer; mimetype: string; originalname: string },
         isPrivate = false,
     ): Promise<UploadFileResponse> {
-        const fileName = generateFileName(file);
-
         const bucket = isPrivate ? this.privateBucketName : this.publicBucketName;
+
+        const fileName = this.generateFileNameFunc({
+            ...file,
+            bucket,
+            region: this.region
+        });
+
 
         const params: PutObjectCommandInput = {
             Bucket: bucket,
@@ -264,21 +259,3 @@ export class S3Config {
         return results;
     };
 }
-
-
-/**
- * Checks if multiple uploaded files are images.
- * @param files - An array of file objects (e.g., from Multer).
- * @throws Error if any file is not an image.
- */
-export const checkFilesAreImages = (
-    files: { mimetype: string }[]
-): void => {
-    for (const file of files) {
-        if (!file.mimetype.startsWith('image')) {
-            throw new Error('File is not an image');
-        }
-    }
-};
-
-export const s3 = new S3Config();

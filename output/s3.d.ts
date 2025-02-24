@@ -1,5 +1,12 @@
 import { S3Client } from '@aws-sdk/client-s3';
 import { PluginOptions } from './index';
+export type FileMeta = {
+    mimetype: string;
+    originalname: string;
+    bucket: string;
+    region: string;
+};
+export declare function generateFileName(file: FileMeta): string;
 /**
  * Represents the response for a successful file upload.
  */
@@ -8,25 +15,11 @@ export interface UploadFileResponse {
      * Publicly accessible URL of the uploaded file (or a presigned URL if private).
      */
     url: string;
-    /**
-     * Key (path) of the file stored in S3.
-     */
     key: string;
     bucket: string;
     region: string;
 }
-/**
- * Class-validator DTO representation of the upload file response.
- */
-export interface UploadFileResponseDTO {
-    url: string;
-    key: string;
-}
-export interface InputFileKeyDTO {
-    key: string;
-    isPrivate: boolean;
-}
-export declare class S3Config {
+export declare class S3Provider {
     publicBucketName: string;
     privateBucketName: string;
     accessKeyId: string;
@@ -34,6 +27,7 @@ export declare class S3Config {
     customHost?: string;
     region: string;
     client: S3Client;
+    generateFileNameFunc: (file: FileMeta) => string;
     get url(): string;
     init(options: PluginOptions): void;
     /**
@@ -102,13 +96,4 @@ export declare class S3Config {
         originalname: string;
     }[]) => Promise<UploadFileResponse[]>;
 }
-/**
- * Checks if multiple uploaded files are images.
- * @param files - An array of file objects (e.g., from Multer).
- * @throws Error if any file is not an image.
- */
-export declare const checkFilesAreImages: (files: {
-    mimetype: string;
-}[]) => void;
-export declare const s3: S3Config;
 //# sourceMappingURL=s3.d.ts.map

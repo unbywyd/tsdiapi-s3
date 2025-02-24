@@ -1,21 +1,41 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.s3Client = void 0;
+exports.generateFileName = exports.S3Provider = void 0;
+exports.getS3Provider = getS3Provider;
 exports.default = createPlugin;
 const s3_1 = require("./s3");
 var s3_2 = require("./s3");
-Object.defineProperty(exports, "s3Client", { enumerable: true, get: function () { return s3_2.s3; } });
+Object.defineProperty(exports, "S3Provider", { enumerable: true, get: function () { return s3_2.S3Provider; } });
+Object.defineProperty(exports, "generateFileName", { enumerable: true, get: function () { return s3_2.generateFileName; } });
+let s3Provider = null;
+const defaultConfig = {
+    publicBucketName: "",
+    privateBucketName: "",
+    accessKeyId: "",
+    secretAccessKey: "",
+    region: "",
+    customHost: "",
+};
 class App {
     name = 'tsdiapi-s3';
     config;
     context;
+    provider;
     constructor(config) {
-        this.config = { ...config };
+        this.config = {
+            ...defaultConfig,
+            ...config
+        };
+        this.provider = new s3_1.S3Provider();
     }
     async onInit(ctx) {
+        if (s3Provider) {
+            ctx.logger.warn("⚠ S3 Plugin already initialized");
+            return;
+        }
         this.context = ctx;
         const config = this.config;
-        const appConfig = this.context.config.appConfig;
+        const appConfig = this.context.config.appConfig || {};
         const publicBucketName = appConfig?.publicBucketName || appConfig['AWS_PUBLIC_BUCKET_NAME'] || config.publicBucketName;
         const privateBucketName = appConfig?.privateBucketName || appConfig['AWS_PRIVATE_BUCKET_NAME'] || config.privateBucketName;
         const accessKeyId = appConfig?.accessKeyId || appConfig['AWS_ACCESS_KEY_ID'] || config.accessKeyId;
@@ -40,8 +60,16 @@ class App {
         if (!this.config.region) {
             throw new Error('region is required');
         }
-        s3_1.s3.init(this.config);
+        this.provider.init(this.config);
+        s3Provider = this.provider;
+        ctx.logger.info("✅ S3 Plugin initialized");
     }
+}
+function getS3Provider() {
+    if (!s3Provider) {
+        throw new Error('S3 Plugin not initialized');
+    }
+    return s3Provider;
 }
 function createPlugin(config) {
     return new App(config);
