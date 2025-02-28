@@ -3,7 +3,7 @@
     "description": "A TSDIAPI plugin for seamless AWS S3 integration, enabling file uploads, downloads, and presigned URL generation.",
     "variables": [
         {
-            "key": "AWS_PUBLIC_BUCKET_NAME",
+            "name": "AWS_PUBLIC_BUCKET_NAME",
             "type": "string",
             "default": "",
             "configurable": true,
@@ -14,7 +14,7 @@
             }
         },
         {
-            "key": "AWS_PRIVATE_BUCKET_NAME",
+            "name": "AWS_PRIVATE_BUCKET_NAME",
             "type": "string",
             "default": "",
             "configurable": true,
@@ -25,7 +25,7 @@
             }
         },
         {
-            "key": "AWS_ACCESS_KEY_ID",
+            "name": "AWS_ACCESS_KEY_ID",
             "type": "string",
             "default": "",
             "configurable": true,
@@ -36,7 +36,7 @@
             }
         },
         {
-            "key": "AWS_SECRET_ACCESS_KEY",
+            "name": "AWS_SECRET_ACCESS_KEY",
             "type": "string",
             "default": "",
             "configurable": true,
@@ -48,7 +48,7 @@
             }
         },
         {
-            "key": "AWS_REGION",
+            "name": "AWS_REGION",
             "type": "string",
             "default": "us-east-1",
             "configurable": true,
@@ -58,7 +58,7 @@
             }
         },
         {
-            "key": "AWS_CUSTOM_HOST",
+            "name": "AWS_CUSTOM_HOST",
             "type": "string",
             "configurable": true,
             "description": "The AWS custom host",
