@@ -66,5 +66,8 @@
                 "message": "Custom host (optional):"
             }
         }
+    ],
+    "postMessages": [
+        "✅ Plugin S3 has been successfully installed!"
     ]
 }
