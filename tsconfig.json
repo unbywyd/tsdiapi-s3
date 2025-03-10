@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "target": "ES2022",
-        "module": "CommonJS",
+        "module": "NodeNext",
         "noImplicitAny": true,
         "outDir": "./output/",
         "declaration": true,
@@ -10,7 +10,7 @@
         "strict": false,
         "esModuleInterop": true,
         "sourceMap": true,
-        "moduleResolution": "node",
+        "moduleResolution": "nodenext",
         "emitDecoratorMetadata": true,
         "skipLibCheck": true,
         "experimentalDecorators": true,

@@ -1,5 +1,5 @@
 import { S3Client } from '@aws-sdk/client-s3';
-import { PluginOptions } from './index';
+import { PluginOptions } from './index.js';
 export type FileMeta = {
     mimetype: string;
     originalname: string;

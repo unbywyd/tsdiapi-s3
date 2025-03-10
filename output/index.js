@@ -1,12 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.generateFileName = exports.S3Provider = void 0;
-exports.getS3Provider = getS3Provider;
-exports.default = createPlugin;
-const s3_1 = require("./s3");
-var s3_2 = require("./s3");
-Object.defineProperty(exports, "S3Provider", { enumerable: true, get: function () { return s3_2.S3Provider; } });
-Object.defineProperty(exports, "generateFileName", { enumerable: true, get: function () { return s3_2.generateFileName; } });
+import { S3Provider } from './s3.js';
+export { S3Provider, generateFileName } from './s3.js';
 let s3Provider = null;
 const defaultConfig = {
     publicBucketName: "",
@@ -26,7 +19,7 @@ class App {
             ...defaultConfig,
             ...config
         };
-        this.provider = new s3_1.S3Provider();
+        this.provider = new S3Provider();
     }
     async onInit(ctx) {
         if (s3Provider) {
@@ -65,13 +58,13 @@ class App {
         ctx.logger.info("✅ S3 Plugin initialized");
     }
 }
-function getS3Provider() {
+export function getS3Provider() {
     if (!s3Provider) {
         throw new Error('S3 Plugin not initialized');
     }
     return s3Provider;
 }
-function createPlugin(config) {
+export default function createPlugin(config) {
     return new App(config);
 }
 //# sourceMappingURL=index.js.map

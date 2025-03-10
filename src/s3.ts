@@ -13,7 +13,7 @@ import {
 import { randomBytes } from 'crypto';
 
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { PluginOptions } from './index';
+import { PluginOptions } from './index.js';
 
 export type FileMeta = { mimetype: string; originalname: string; bucket: string; region: string };
 export function generateFileName(file: FileMeta): string {

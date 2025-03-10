@@ -1,18 +1,14 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.S3Provider = void 0;
-exports.generateFileName = generateFileName;
-const client_s3_1 = require("@aws-sdk/client-s3");
-const crypto_1 = require("crypto");
-const s3_request_presigner_1 = require("@aws-sdk/s3-request-presigner");
-function generateFileName(file) {
+import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand, } from '@aws-sdk/client-s3';
+import { randomBytes } from 'crypto';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+export function generateFileName(file) {
     const now = new Date();
     const dateFolder = now.toISOString().split('T')[0];
-    const uniqueHash = (0, crypto_1.randomBytes)(8).toString('hex');
+    const uniqueHash = randomBytes(8).toString('hex');
     const fileExtension = file.originalname.split('.').pop();
     return `${dateFolder}/${uniqueHash}.${fileExtension}`;
 }
-class S3Provider {
+export class S3Provider {
     publicBucketName;
     privateBucketName;
     accessKeyId;
@@ -42,7 +38,7 @@ class S3Provider {
                 secretAccessKey: this.secretAccessKey,
             },
         };
-        this.client = new client_s3_1.S3Client(s3Config);
+        this.client = new S3Client(s3Config);
     }
     /**
      * Deletes a file from an S3 bucket.
@@ -56,7 +52,7 @@ class S3Provider {
                 Bucket: isPrivate ? this.privateBucketName : this.publicBucketName,
                 Key: key,
             };
-            const command = new client_s3_1.DeleteObjectCommand(params);
+            const command = new DeleteObjectCommand(params);
             await this.client.send(command);
             return true;
         }
@@ -75,8 +71,8 @@ class S3Provider {
             Bucket: isPrivate ? this.privateBucketName : this.publicBucketName,
             Key: fileKey,
         };
-        const command = new client_s3_1.GetObjectCommand(params);
-        return (0, s3_request_presigner_1.getSignedUrl)(this.client, command, { expiresIn: 3600 });
+        const command = new GetObjectCommand(params);
+        return getSignedUrl(this.client, command, { expiresIn: 3600 });
     }
     /**
      * Uploads a buffer to an S3 bucket (public by default).
@@ -102,7 +98,7 @@ class S3Provider {
             ServerSideEncryption: 'AES256',
         };
         return new Promise((resolve, reject) => {
-            const command = new client_s3_1.PutObjectCommand(params);
+            const command = new PutObjectCommand(params);
             this.client.send(command, async (error) => {
                 if (error) {
                     reject(error);
@@ -141,7 +137,7 @@ class S3Provider {
             ServerSideEncryption: 'AES256',
         };
         return new Promise((resolve, reject) => {
-            const command = new client_s3_1.PutObjectCommand(params);
+            const command = new PutObjectCommand(params);
             this.client.send(command, async (error) => {
                 if (error) {
                     console.error('uploadToS3 error:', error);
@@ -203,5 +199,4 @@ class S3Provider {
         return results;
     };
 }
-exports.S3Provider = S3Provider;
 //# sourceMappingURL=s3.js.map

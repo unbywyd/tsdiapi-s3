@@ -1,6 +1,6 @@
 import type { AppContext, AppPlugin } from "@tsdiapi/server";
-import { FileMeta, S3Provider, UploadFileResponse } from './s3';
-export { S3Provider, generateFileName } from './s3';
+import { FileMeta, S3Provider, UploadFileResponse } from './s3.js';
+export { S3Provider, generateFileName } from './s3.js';
 
 let s3Provider: S3Provider | null = null;
 
