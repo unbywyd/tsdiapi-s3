@@ -12,7 +12,7 @@
 ✅ **File Uploads** – Upload single or multiple files using buffers or file objects.  
 ✅ **File Deletion** – Remove files from both public and private buckets.  
 ✅ **Flexible Configuration** – Use inline options or environment variables for AWS credentials and bucket details.  
-✅ **Global Provider Access** – Use `getS3Provider()` to access S3 services from anywhere in your app.  
+✅ **Global Provider Access** – Use `useS3Provider()` to access S3 services from anywhere in your app.  
 
 ---
 
@@ -98,9 +98,9 @@ createApp({
 
 ### **1️⃣ Upload a File**  
 ```typescript
-import { getS3Provider } from "@tsdiapi/s3";
+import { useS3Provider } from "@tsdiapi/s3";
 
-const s3 = getS3Provider();
+const s3 = useS3Provider();
 const response = await s3.uploadFile(
   "your-public-bucket",
   "example.png",
@@ -113,22 +113,22 @@ console.log(response.url);
 
 ### **2️⃣ Upload Multiple Files**  
 ```typescript
-const responses = await getS3Provider().uploadFiles(fileArray);
+const responses = await useS3Provider().uploadFiles(fileArray);
 ```
 
 ### **3️⃣ Delete a File**  
 ```typescript
-await getS3Provider().deleteFile("path/to/file.png", false);
+await useS3Provider().deleteFile("path/to/file.png", false);
 ```
 
 ### **4️⃣ Generate a Presigned URL**  
 ```typescript
-const presignedUrl = await getS3Provider().getPresignedUrl("path/to/file.png", true);
+const presignedUrl = await useS3Provider().getPresignedUrl("path/to/file.png", true);
 ```
 
 ### **5️⃣ Get Public URL**  
 ```typescript
-const publicUrl = getS3Provider().getPublicURL("path/to/file.png");
+const publicUrl = useS3Provider().getPublicURL("path/to/file.png");
 ```
 
 ---
@@ -147,7 +147,7 @@ All methods include built-in error handling and logging:
 
 ```typescript
 try {
-  const response = await getS3Provider().uploadFile(
+  const response = await useS3Provider().uploadFile(
     "your-public-bucket",
     "example.pdf",
     fileBuffer,

@@ -1,9 +1,15 @@
 import type { AppContext, AppPlugin } from "@tsdiapi/server";
 import { FileMeta, S3Provider, UploadFileResponse } from './s3.js';
 export { S3Provider, generateFileName } from './s3.js';
+import { FastifyInstance } from 'fastify';
+
+declare module "fastify" {
+    interface FastifyInstance {
+        s3: S3Provider;
+    }
+}
 
 let s3Provider: S3Provider | null = null;
-
 export type PluginOptions = {
     publicBucketName?: string;
     privateBucketName?: string;
@@ -36,18 +42,18 @@ class App implements AppPlugin {
     }
     async onInit(ctx: AppContext) {
         if (s3Provider) {
-            ctx.logger.warn("⚠ S3 Plugin already initialized");
+            ctx.fastify.log.warn('S3 Plugin already initialized');
             return;
         }
         this.context = ctx;
         const config = this.config;
-        const appConfig = this.context.config.appConfig || {};
-        const publicBucketName = appConfig?.publicBucketName || appConfig['AWS_PUBLIC_BUCKET_NAME'] || config.publicBucketName;
-        const privateBucketName = appConfig?.privateBucketName || appConfig['AWS_PRIVATE_BUCKET_NAME'] || config.privateBucketName;
-        const accessKeyId = appConfig?.accessKeyId || appConfig['AWS_ACCESS_KEY_ID'] || config.accessKeyId;
-        const secretAccessKey = appConfig?.secretAccessKey || appConfig['AWS_SECRET_ACCESS_KEY'] || config.secretAccessKey;
-        const region = appConfig?.region || appConfig['AWS_REGION'] || config.region;
-        const customHost = appConfig?.customHost || appConfig['AWS_CUSTOM_HOST'] || config.customHost;
+        const projectConfig = this.context.projectConfig;
+        const publicBucketName = projectConfig.get('AWS_PUBLIC_BUCKET_NAME', config.publicBucketName) as string;
+        const privateBucketName = projectConfig.get('AWS_PRIVATE_BUCKET_NAME', config.privateBucketName) as string;
+        const accessKeyId = projectConfig.get('AWS_ACCESS_KEY_ID', config.accessKeyId) as string;
+        const secretAccessKey = projectConfig.get('AWS_SECRET_ACCESS_KEY', config.secretAccessKey) as string;
+        const region = projectConfig.get('AWS_REGION', config.region) as string;
+        const customHost = projectConfig.get('AWS_CUSTOM_HOST', config.customHost) as string;
 
         this.config.customHost = customHost;
         this.config.publicBucketName = publicBucketName;
@@ -70,11 +76,11 @@ class App implements AppPlugin {
         }
         this.provider.init(this.config);
         s3Provider = this.provider;
-        ctx.logger.info("✅ S3 Plugin initialized");
+        ctx.fastify.decorate('s3', this.provider);
     }
 }
 
-export function getS3Provider(): S3Provider {
+export function useS3Provider(): S3Provider {
     if (!s3Provider) {
         throw new Error('S3 Plugin not initialized');
     }
