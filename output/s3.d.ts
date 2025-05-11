@@ -1,12 +1,21 @@
 import { S3Client } from '@aws-sdk/client-s3';
 import { PluginOptions } from './index.js';
 export type FileMeta = {
+    type: string;
+    name: string;
+    size?: number;
+    extension?: string;
+};
+export type UploadFileData = {
+    buffer: Buffer;
     mimetype: string;
     originalname: string;
-    bucket: string;
-    region: string;
+    id?: string;
+    bucket?: string;
+    region?: string;
 };
-export declare function generateFileName(file: FileMeta): string;
+export declare function generateFileName(file: UploadFileData): string;
+export declare function getFileMeta(file: UploadFileData): Promise<FileMeta>;
 /**
  * Represents the response for a successful file upload.
  */
@@ -18,6 +27,8 @@ export interface UploadFileResponse {
     key: string;
     bucket: string;
     region: string;
+    id?: string;
+    meta?: FileMeta;
 }
 export declare class S3Provider {
     publicBucketName: string;
@@ -27,7 +38,7 @@ export declare class S3Provider {
     customHost?: string;
     region: string;
     client: S3Client;
-    generateFileNameFunc: (file: FileMeta) => string;
+    generateFileNameFunc: (file: UploadFileData) => string;
     get url(): string;
     init(options: PluginOptions): void;
     /**
@@ -51,7 +62,7 @@ export declare class S3Provider {
      * @param bucket - The target S3 bucket; defaults to the public bucket.
      * @returns An object containing the public URL or presigned URL (if private) and the S3 key.
      */
-    uploadBufferToS3(buffer: Buffer, mimetype: string, originalname: string, isPrivate?: boolean): Promise<UploadFileResponse>;
+    uploadBufferToS3(buffer: Buffer, mimetype: string, originalname: string, isPrivate?: boolean, id?: string): Promise<UploadFileResponse>;
     /**
         * Uploads a file to an S3 bucket (public by default).
         * @param file - A file object (e.g., from Multer) with buffer, mimetype, and originalname.
@@ -62,6 +73,7 @@ export declare class S3Provider {
         buffer: Buffer;
         mimetype: string;
         originalname: string;
+        id?: string;
     }, isPrivate?: boolean): Promise<UploadFileResponse>;
     /**
      * Constructs a public URL for a file in the public bucket (non-presigned).
@@ -84,6 +96,7 @@ export declare class S3Provider {
         buffer: Buffer;
         mimetype: string;
         originalname: string;
+        id?: string;
     }[]) => Promise<UploadFileResponse[]>;
     /**
      * Uploads multiple files to the public S3 bucket.
@@ -94,6 +107,7 @@ export declare class S3Provider {
         buffer: Buffer;
         mimetype: string;
         originalname: string;
+        id?: string;
     }[]) => Promise<UploadFileResponse[]>;
 }
 //# sourceMappingURL=s3.d.ts.map

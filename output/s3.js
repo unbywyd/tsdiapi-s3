@@ -1,5 +1,6 @@
 import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand, } from '@aws-sdk/client-s3';
 import { randomBytes } from 'crypto';
+import { fileTypeFromBuffer } from 'file-type';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 export function generateFileName(file) {
     const now = new Date();
@@ -7,6 +8,16 @@ export function generateFileName(file) {
     const uniqueHash = randomBytes(8).toString('hex');
     const fileExtension = file.originalname.split('.').pop();
     return `${dateFolder}/${uniqueHash}.${fileExtension}`;
+}
+export async function getFileMeta(file) {
+    const { buffer, mimetype, originalname } = file;
+    const fileType = await fileTypeFromBuffer(buffer);
+    return {
+        type: fileType?.mime || file?.mimetype || 'application/octet-stream',
+        name: file?.originalname || fileType?.ext || 'unknown',
+        size: buffer.length,
+        extension: fileType?.ext || 'unknown',
+    };
 }
 export class S3Provider {
     publicBucketName;
@@ -82,9 +93,10 @@ export class S3Provider {
      * @param bucket - The target S3 bucket; defaults to the public bucket.
      * @returns An object containing the public URL or presigned URL (if private) and the S3 key.
      */
-    async uploadBufferToS3(buffer, mimetype, originalname, isPrivate = false) {
+    async uploadBufferToS3(buffer, mimetype, originalname, isPrivate = false, id) {
         const bucket = isPrivate ? this.privateBucketName : this.publicBucketName;
         const fileName = this.generateFileNameFunc({
+            buffer,
             mimetype,
             originalname,
             bucket,
@@ -110,7 +122,9 @@ export class S3Provider {
                             : `${this.url}${fileName}`,
                         key: fileName,
                         bucket: bucket,
-                        region: this.region
+                        region: this.region,
+                        id: id,
+                        meta: await getFileMeta({ buffer, mimetype, originalname, bucket, region: this.region })
                     });
                 }
             });
@@ -150,7 +164,9 @@ export class S3Provider {
                             : `${this.url}${fileName}`,
                         key: fileName,
                         bucket: bucket,
-                        region: this.region
+                        region: this.region,
+                        id: file.id,
+                        meta: await getFileMeta({ buffer: file.buffer, mimetype: file.mimetype, originalname: file.originalname, bucket, region: this.region })
                     });
                 }
             });

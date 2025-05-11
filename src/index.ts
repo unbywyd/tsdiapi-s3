@@ -1,6 +1,6 @@
 import type { AppContext, AppPlugin } from "@tsdiapi/server";
-import { FileMeta, S3Provider, UploadFileResponse } from './s3.js';
-export { S3Provider, generateFileName } from './s3.js';
+import { UploadFileData, S3Provider, UploadFileResponse } from './s3.js';
+export { S3Provider, generateFileName, getFileMeta } from './s3.js';
 import { FastifyInstance } from 'fastify';
 
 declare module "fastify" {
@@ -17,7 +17,7 @@ export type PluginOptions = {
     secretAccessKey?: string;
     region?: string;
     customHost?: string;
-    generateFileNameFunc?: (file: FileMeta) => string;
+    generateFileNameFunc?: (file: UploadFileData) => string;
 }
 const defaultConfig: PluginOptions = {
     publicBucketName: "",
@@ -87,7 +87,7 @@ export function useS3Provider(): S3Provider {
     return s3Provider;
 }
 
-export type { FileMeta, UploadFileResponse };
+export type { UploadFileData as FileMeta, UploadFileResponse };
 
 export default function createPlugin(config?: PluginOptions) {
     return new App(config);

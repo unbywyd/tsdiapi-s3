@@ -1,5 +1,5 @@
 import { S3Provider } from './s3.js';
-export { S3Provider, generateFileName } from './s3.js';
+export { S3Provider, generateFileName, getFileMeta } from './s3.js';
 let s3Provider = null;
 const defaultConfig = {
     publicBucketName: "",

@@ -11,18 +11,31 @@ import {
 } from '@aws-sdk/client-s3';
 
 import { randomBytes } from 'crypto';
-
+import { fileTypeFromBuffer } from 'file-type';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { PluginOptions } from './index.js';
 
-export type FileMeta = { mimetype: string; originalname: string; bucket: string; region: string };
-export function generateFileName(file: FileMeta): string {
+export type FileMeta = { type: string; name: string; size?: number, extension?: string };
+export type UploadFileData = { buffer: Buffer; mimetype: string; originalname: string, id?: string, bucket?: string, region?: string };
+
+export function generateFileName(file: UploadFileData): string {
     const now = new Date();
     const dateFolder = now.toISOString().split('T')[0];
     const uniqueHash = randomBytes(8).toString('hex');
     const fileExtension = file.originalname.split('.').pop();
 
     return `${dateFolder}/${uniqueHash}.${fileExtension}`;
+}
+
+export async function getFileMeta(file: UploadFileData): Promise<FileMeta> {
+    const { buffer, mimetype, originalname } = file;
+    const fileType = await fileTypeFromBuffer(buffer);
+    return {
+        type: fileType?.mime || file?.mimetype || 'application/octet-stream',
+        name: file?.originalname || fileType?.ext || 'unknown',
+        size: buffer.length,
+        extension: fileType?.ext || 'unknown',
+    };
 }
 
 /**
@@ -36,6 +49,8 @@ export interface UploadFileResponse {
     key: string;
     bucket: string;
     region: string;
+    id?: string;
+    meta?: FileMeta;
 }
 
 export class S3Provider {
@@ -46,7 +61,7 @@ export class S3Provider {
     customHost?: string;
     region: string;
     client: S3Client;
-    generateFileNameFunc: (file: FileMeta) => string = generateFileName;
+    generateFileNameFunc: (file: UploadFileData) => string = generateFileName;
     get url() {
         const host = this?.customHost ? this.customHost : `https://${this.publicBucketName}.s3.${this.region}.amazonaws.com`;
         return host.endsWith('/') ? host : `${host}/`;
@@ -123,10 +138,12 @@ export class S3Provider {
         mimetype: string,
         originalname: string,
         isPrivate = false,
+        id?: string
     ): Promise<UploadFileResponse> {
         const bucket = isPrivate ? this.privateBucketName : this.publicBucketName;
 
         const fileName = this.generateFileNameFunc({
+            buffer,
             mimetype,
             originalname,
             bucket,
@@ -153,7 +170,9 @@ export class S3Provider {
                             : `${this.url}${fileName}`,
                         key: fileName,
                         bucket: bucket,
-                        region: this.region
+                        region: this.region,
+                        id: id,
+                        meta: await getFileMeta({ buffer, mimetype, originalname, bucket, region: this.region })
                     });
                 }
             });
@@ -169,7 +188,7 @@ export class S3Provider {
         */
 
     async uploadToS3(
-        file: { buffer: Buffer; mimetype: string; originalname: string },
+        file: { buffer: Buffer; mimetype: string; originalname: string, id?: string },
         isPrivate = false,
     ): Promise<UploadFileResponse> {
         const bucket = isPrivate ? this.privateBucketName : this.publicBucketName;
@@ -202,7 +221,9 @@ export class S3Provider {
                             : `${this.url}${fileName}`,
                         key: fileName,
                         bucket: bucket,
-                        region: this.region
+                        region: this.region,
+                        id: file.id,
+                        meta: await getFileMeta({ buffer: file.buffer, mimetype: file.mimetype, originalname: file.originalname, bucket, region: this.region })
                     });
                 }
             });
@@ -233,7 +254,7 @@ export class S3Provider {
      * @returns An array of UploadFileResponse objects for each uploaded file.
      */
     uploadPrivateFiles = async (
-        files: { buffer: Buffer; mimetype: string; originalname: string }[]
+        files: { buffer: Buffer; mimetype: string; originalname: string, id?: string }[]
     ): Promise<UploadFileResponse[]> => {
         const results: UploadFileResponse[] = [];
         for (const file of files) {
@@ -249,7 +270,7 @@ export class S3Provider {
      * @returns An array of UploadFileResponse objects for each uploaded file.
      */
     uploadFiles = async (
-        files: { buffer: Buffer; mimetype: string; originalname: string }[]
+        files: { buffer: Buffer; mimetype: string; originalname: string, id?: string }[]
     ): Promise<UploadFileResponse[]> => {
         const results: UploadFileResponse[] = [];
         for (const file of files) {
