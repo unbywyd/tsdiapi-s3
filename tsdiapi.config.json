@@ -67,7 +67,37 @@
             }
         }
     ],
+    "generators": [
+        {
+            "name": "controller",
+            "description": "Generate a new controller in the API",
+            "files": [
+                {
+                    "source": "generators/controller/*.*",
+                    "destination": "src/api/{{name}}",
+                    "isRoot": true,
+                    "overwrite": false,
+                    "isHandlebarsTemplate": true
+                }
+            ],
+            "postMessages": [
+                "✅ Controller {{name}} created successfully!"
+            ]
+        }
+    ],
+    "prisma": {
+        "required": true,
+        "scripts": [
+            {
+                "command": "ADD MODEL File ({id String @id @default(cuid())|name String?|ownerId String?|isPrivate Boolean @default(false)|extension String?|mimeType String?|size Float?|url String|key String|bucket String?|region String?});",
+                "description": "Add File Model"
+            }
+        ]
+    },
     "postMessages": [
         "✅ Plugin S3 has been successfully installed!"
+    ],
+    "requiredPackages": [
+        "@tsdiapi/jwt-auth"
     ]
 }
