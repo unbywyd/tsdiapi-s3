@@ -42,6 +42,11 @@ export declare class S3Provider {
     get url(): string;
     init(options: PluginOptions): void;
     /**
+     * Проверяет синхронизацию времени сервера с AWS.
+     * Помогает диагностировать проблемы с presigned URLs.
+     */
+    private checkClockSync;
+    /**
      * Deletes a file from an S3 bucket.
      * @param key - S3 object key (path) to delete.
      * @param isPrivate - If true, deletes from the private bucket; otherwise from the public bucket.
@@ -49,11 +54,31 @@ export declare class S3Provider {
      */
     deleteFromS3: (key: string, isPrivate?: boolean) => Promise<boolean>;
     /**
-     * Retrieves a presigned URL for a file in the public S3 bucket.
+     * Retrieves a presigned URL for a file in S3.
      * @param fileKey - The key (path) of the file in S3.
+     * @param isPrivate - If true, uses the private bucket; otherwise uses the public bucket.
+     * @param expiresIn - Time in seconds until the URL expires (default: 3600 = 1 hour).
      * @returns A string containing the presigned URL.
      */
-    getPresignedUrl(fileKey: string, isPrivate?: boolean): Promise<string>;
+    getPresignedUrl(fileKey: string, isPrivate?: boolean, expiresIn?: number): Promise<string>;
+    /**
+     * Создает presigned URL с расширенными опциями для диагностики проблем с временем.
+     * @param fileKey - The key (path) of the file in S3.
+     * @param isPrivate - If true, uses the private bucket; otherwise uses the public bucket.
+     * @param expiresIn - Time in seconds until the URL expires.
+     * @param options - Дополнительные опции для генерации URL.
+     * @returns Объект с presigned URL и метаданными.
+     */
+    getPresignedUrlWithMeta(fileKey: string, isPrivate?: boolean, expiresIn?: number, options?: {
+        addClockSkewTolerance?: boolean;
+    }): Promise<{
+        url: string;
+        signingTime: string;
+        expirationTime: string;
+        expiresIn: number;
+        bucket: string;
+        key: string;
+    }>;
     /**
      * Uploads a buffer to an S3 bucket (public by default).
      * @param buffer - The file contents as a buffer.
@@ -84,9 +109,10 @@ export declare class S3Provider {
     /**
      * Retrieves a presigned URL for a file in the private bucket.
      * @param fileName - The key (path) of the file in S3.
+     * @param expiresIn - Time in seconds until the URL expires (default: 3600 = 1 hour).
      * @returns A presigned URL giving access to the file.
      */
-    getPrivateURL: (fileName: string) => Promise<string>;
+    getPrivateURL: (fileName: string, expiresIn?: number) => Promise<string>;
     /**
      * Uploads multiple files to the private S3 bucket.
      * @param files - An array of file objects (e.g., from Multer).
