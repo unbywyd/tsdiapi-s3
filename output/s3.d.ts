@@ -42,11 +42,6 @@ export declare class S3Provider {
     get url(): string;
     init(options: PluginOptions): void;
     /**
-     * Проверяет синхронизацию времени сервера с AWS.
-     * Помогает диагностировать проблемы с presigned URLs.
-     */
-    private checkClockSync;
-    /**
      * Deletes a file from an S3 bucket.
      * @param key - S3 object key (path) to delete.
      * @param isPrivate - If true, deletes from the private bucket; otherwise from the public bucket.

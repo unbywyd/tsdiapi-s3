@@ -52,24 +52,6 @@ export class S3Provider {
             systemClockOffset: 0,
         };
         this.client = new S3Client(s3Config);
-        // Проверяем синхронизацию времени при инициализации
-        this.checkClockSync();
-    }
-    /**
-     * Проверяет синхронизацию времени сервера с AWS.
-     * Помогает диагностировать проблемы с presigned URLs.
-     */
-    async checkClockSync() {
-        try {
-            console.log(`Server local time: ${new Date().toString()}`);
-            console.log(`Server UTC time: ${new Date().toISOString()}`);
-            console.log(`Timezone offset: ${new Date().getTimezoneOffset()} minutes`);
-            // Можно добавить запрос к AWS для получения серверного времени
-            // Но это требует дополнительного API вызова
-        }
-        catch (error) {
-            console.warn('Could not check clock synchronization:', error);
-        }
     }
     /**
      * Deletes a file from an S3 bucket.
@@ -115,11 +97,6 @@ export class S3Provider {
                 unhoistableHeaders: new Set(),
                 signableHeaders: new Set(['host'])
             });
-            const expirationTime = new Date(signingDate.getTime() + (expiresIn * 1000));
-            console.log(`Generated presigned URL for ${fileKey}`);
-            console.log(`Signing time (UTC): ${signingDate.toISOString()}`);
-            console.log(`Expiration time (UTC): ${expirationTime.toISOString()}`);
-            console.log(`Expires in: ${expiresIn} seconds`);
             return signedUrl;
         }
         catch (error) {

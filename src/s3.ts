@@ -86,27 +86,9 @@ export class S3Provider {
             systemClockOffset: 0,
         };
         this.client = new S3Client(s3Config);
-        
-        // Проверяем синхронизацию времени при инициализации
-        this.checkClockSync();
     }
 
-    /**
-     * Проверяет синхронизацию времени сервера с AWS.
-     * Помогает диагностировать проблемы с presigned URLs.
-     */
-    private async checkClockSync(): Promise<void> {
-        try {
-            console.log(`Server local time: ${new Date().toString()}`);
-            console.log(`Server UTC time: ${new Date().toISOString()}`);
-            console.log(`Timezone offset: ${new Date().getTimezoneOffset()} minutes`);
-            
-            // Можно добавить запрос к AWS для получения серверного времени
-            // Но это требует дополнительного API вызова
-        } catch (error) {
-            console.warn('Could not check clock synchronization:', error);
-        }
-    }
+
 
     /**
      * Deletes a file from an S3 bucket.
@@ -145,26 +127,20 @@ export class S3Provider {
             Key: fileKey,
         };
         const command = new GetObjectCommand(params);
-        
+
         try {
             // Создаем точное UTC время для подписи
             const signingDate = new Date();
-            
-            const signedUrl = await getSignedUrl(this.client, command, { 
+
+            const signedUrl = await getSignedUrl(this.client, command, {
                 expiresIn,
                 signingDate,
                 // Дополнительные опции для стабильности
                 unhoistableHeaders: new Set(),
                 signableHeaders: new Set(['host'])
             });
-            
-            const expirationTime = new Date(signingDate.getTime() + (expiresIn * 1000));
-            
-            console.log(`Generated presigned URL for ${fileKey}`);
-            console.log(`Signing time (UTC): ${signingDate.toISOString()}`);
-            console.log(`Expiration time (UTC): ${expirationTime.toISOString()}`);
-            console.log(`Expires in: ${expiresIn} seconds`);
-            
+
+
             return signedUrl;
         } catch (error) {
             console.error('Error generating presigned URL:', error);
@@ -181,8 +157,8 @@ export class S3Provider {
      * @returns Объект с presigned URL и метаданными.
      */
     async getPresignedUrlWithMeta(
-        fileKey: string, 
-        isPrivate = false, 
+        fileKey: string,
+        isPrivate = false,
         expiresIn = 3600,
         options: { addClockSkewTolerance?: boolean } = {}
     ): Promise<{
@@ -195,25 +171,25 @@ export class S3Provider {
     }> {
         // Добавляем толерантность к расхождению часов (5 минут)
         const actualExpiresIn = options.addClockSkewTolerance ? expiresIn + 300 : expiresIn;
-        
+
         const bucket = isPrivate ? this.privateBucketName : this.publicBucketName;
         const params: GetObjectCommandInput = {
             Bucket: bucket,
             Key: fileKey,
         };
         const command = new GetObjectCommand(params);
-        
+
         const signingDate = new Date();
         const expirationTime = new Date(signingDate.getTime() + (actualExpiresIn * 1000));
-        
+
         try {
-            const signedUrl = await getSignedUrl(this.client, command, { 
+            const signedUrl = await getSignedUrl(this.client, command, {
                 expiresIn: actualExpiresIn,
                 signingDate,
                 unhoistableHeaders: new Set(),
                 signableHeaders: new Set(['host'])
             });
-            
+
             return {
                 url: signedUrl,
                 signingTime: signingDate.toISOString(),
